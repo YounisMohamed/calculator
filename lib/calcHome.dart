@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'package:nice_buttons/nice_buttons.dart';
 
 class CalculatorPage extends StatefulWidget {
   @override
@@ -10,12 +12,12 @@ class CalculatorPage extends StatefulWidget {
 }
 
 class _CalculatorPageState extends State<CalculatorPage> {
-  String _expression = "";
-  String _result = "Hello Younis";
-
   String _evaluateExpression(String expression) {
     try {
       if (expression == "696969") return "Nice <3";
+      if (expression == "682003") return "Thats my birthday <3";
+      if (expression == "6-8-2003") return "Thats my birthday <3";
+
       expression = expression
           .replaceAll('√', "sqrt")
           .replaceAll('π', Number(math.pi).toString())
@@ -226,13 +228,47 @@ class _CalculatorPageState extends State<CalculatorPage> {
     return expression;
   }
 
+  void setTheme(int themeInt) {
+    theme = themeInt;
+  }
+
+  static String name = "YONES";
+  List<String> functionalButtons = name.split("");
+  void PRINT() {
+    print(functionalButtons);
+  }
+
+  String _expression = "";
+  // ${name.substring(0, 1)}${name.substring(1).toLowerCase()}
+  String _result = "Hello Younis";
+  String _savedResult = "";
+
   final Color backgroundColor = const Color(0xFF1A1A2E);
   final Color displayBackgroundColor = const Color(0xFF16213E);
   final Color operatorColor = Colors.indigo;
-  final Color deleteColor = const Color(0xFFE94560);
-  final Color functionColor = const Color(0xFF533483);
+  final Color deleteColor = Colors.pink;
+  final Color functionColor = Colors.deepPurple;
   final Color numberColor = Colors.white;
-  final Color resultColor = const Color(0xFF00FFA3);
+  int theme = 0;
+  final List<Map<String, Color>> themes = [
+    {
+      "displayBackground": const Color(0xFF16213E),
+      "divider": Colors.white70,
+      "expressionText": Colors.white,
+      "resultText": Colors.lightBlueAccent,
+    },
+    {
+      "displayBackground": Colors.greenAccent,
+      "divider": Colors.black87,
+      "expressionText": Colors.black,
+      "resultText": Colors.deepPurple,
+    },
+  ];
+  void _toggleTheme() {
+    setState(() {
+      theme = (theme + 1) % themes.length;
+    });
+  }
 
   List<String> buttons = [
     "7",
@@ -246,6 +282,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
     "3",
     "0",
   ];
+
+  get currentTheme => themes[theme];
 
   Color _getButtonColor(String button) {
     if (button == "C" || button == "<") {
@@ -272,12 +310,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
       ".",
     ].contains(button)) {
       return operatorColor;
-    } else if ([
-      "D",
-      "F",
-      "R",
-      "U",
-    ].contains(button)) {
+    } else if (functionalButtons.contains(button)) {
       return functionColor;
     }
     return numberColor;
@@ -287,14 +320,39 @@ class _CalculatorPageState extends State<CalculatorPage> {
     return !buttons.contains(button);
   }
 
+  void showSnackbar(context, String text) {
+    HapticFeedback.lightImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.nunito(),
+        ),
+        backgroundColor: Colors.black,
+        duration: const Duration(milliseconds: 1000),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String> buttons = [
       "C",
       "(",
       ")",
-      "÷",
       "%",
+      "e",
+      "!",
+      "√",
+      "-",
+      "+",
+      "π",
+      "^",
+      "÷",
+      "<",
+      "x",
+      ".",
       "1",
       "3",
       "5",
@@ -305,36 +363,21 @@ class _CalculatorPageState extends State<CalculatorPage> {
       "6",
       "8",
       "0",
-      "x",
-      "√",
-      "-",
-      "+",
-      "π",
-      "^",
-      ".",
-      "<",
-      "!",
-      "&",
       "<<",
       "?",
       "|",
-      "e",
+      "&",
       ">>",
-      "F",
-      "R",
-      "U",
-      "D"
+      ...functionalButtons
     ];
-
     return Scaffold(
-      backgroundColor: Colors.grey[900],
       body: SafeArea(
         child: Column(
           children: [
             // Display for Expression and Result
             Container(
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: currentTheme["displayBackground"],
                 borderRadius: BorderRadius.circular(10),
               ),
               padding: const EdgeInsets.all(20),
@@ -353,12 +396,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         style: GoogleFonts.roboto(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: currentTheme["expressionText"],
                         ),
                       ),
                     ),
                   ),
-                  const Divider(thickness: 1, color: Colors.white30),
+                  Divider(thickness: 1, color: currentTheme["divider"]),
                   Container(
                     alignment: Alignment.centerLeft,
                     height: 80,
@@ -368,9 +411,11 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       child: Text(
                         _result,
                         style: GoogleFonts.roboto(
-                          fontSize: 48,
+                          fontSize: (48 - (_result.length))
+                              .clamp(24.0, 48.0)
+                              .toDouble(),
                           fontWeight: FontWeight.bold,
-                          color: Colors.pinkAccent,
+                          color: currentTheme["resultText"],
                         ),
                       ),
                     ),
@@ -378,101 +423,104 @@ class _CalculatorPageState extends State<CalculatorPage> {
                 ],
               ),
             ),
-            // Buttons Grid
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(8),
-                color: Colors.grey[900],
+                color: Colors.black87,
                 child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5,
-                    crossAxisSpacing: 7,
-                    mainAxisSpacing: 7,
-                  ),
-                  itemCount: buttons.length,
-                  itemBuilder: (context, index) {
-                    String button = buttons[index];
-                    return button.isEmpty
-                        ? const SizedBox.shrink()
-                        : ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                if (button == "C") {
-                                  _expression = "";
-                                  _result = "0";
-                                } else if (button == "<") {
-                                  if (_expression.isNotEmpty) {
-                                    _expression = _expression.substring(
-                                        0, _expression.length - 1);
-                                  }
-                                } else if (button == "F") {
-                                  if (RegExp(r'^[0-9.]+$').hasMatch(_result)) {
-                                    double number = double.parse(_result);
-                                    int flooredNumber = number.floor();
-                                    _result = flooredNumber.toString();
-                                    _expression = _result;
-                                  }
-                                } else if (button == "R") {
-                                  if (RegExp(r'^[0-9.]+$').hasMatch(_result)) {
-                                    double number = double.parse(_result);
-                                    int flooredNumber = number.round();
-                                    _result = flooredNumber.toString();
-                                    _expression = _result;
-                                  }
-                                } else if (button == "U") {
-                                  if (RegExp(r'^[0-9.]+$').hasMatch(_result)) {
-                                    double number = double.parse(_result);
-                                    int flooredNumber = number.ceil();
-                                    _result = flooredNumber.toString();
-                                    _expression = _result;
-                                  }
-                                } else if (button == "D") {
-                                  // Regular expression to match a number followed by 'D' at the end
-                                  _expression += button;
-                                  RegExp regex = RegExp(r'(\d+)(D)$');
-                                  Match? match = regex.firstMatch(_expression);
-                                  if (match != null) {
-                                    int maxNumber = int.parse(match.group(
-                                        1)!); // Extract the number before 'D'
-                                    if (maxNumber > 0) {
-                                      int randomNumber = math.Random()
-                                              .nextInt(maxNumber) +
-                                          1; // Generate random number between 1 and maxNumber
-                                      // Replace 'numberD' with the generated random number
-                                      _expression = _expression.replaceFirst(
-                                          regex, randomNumber.toString());
-                                      _result = _evaluateExpression(
-                                          _expression); // Evaluate the updated expression
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 5,
+                      crossAxisSpacing: 7,
+                      mainAxisSpacing: 7,
+                    ),
+                    itemCount: buttons.length,
+                    itemBuilder: (context, index) {
+                      String button = buttons[index];
+                      return button.isEmpty
+                          ? const SizedBox.shrink()
+                          : NiceButtons(
+                              onTap: (finish) {
+                                setState(() {
+                                  if (button == "C") {
+                                    _expression = "";
+                                    _result = "0";
+                                  } else if (button == "<") {
+                                    if (_expression.isNotEmpty) {
+                                      _expression = _expression.substring(
+                                          0, _expression.length - 1);
                                     }
+                                  } else if (button == functionalButtons[0]) {
+                                    _toggleTheme();
+                                    showSnackbar(context, "Theme Changed!");
+                                  } else if (button == functionalButtons[1]) {
+                                    if (RegExp(r'^[0-9.]+$')
+                                        .hasMatch(_result)) {
+                                      _savedResult = _result;
+                                      showSnackbar(context, "Result Saved!");
+                                    }
+                                  } else if (button == functionalButtons[2]) {
+                                    _expression += _savedResult;
+                                  } else if (button == functionalButtons[3]) {
+                                    if (RegExp(r'^[0-9.]+$')
+                                        .hasMatch(_result)) {
+                                      double number = double.parse(_result);
+                                      int flooredNumber = number.round();
+                                      _result = flooredNumber.toString();
+                                      if (_expression != _result) {
+                                        showSnackbar(
+                                            context, "Number Rounded!");
+                                        _expression = _result;
+                                      }
+                                    }
+                                  } else if (button == functionalButtons[4]) {
+                                    _expression += button;
+                                    RegExp regex = RegExp(r'(\d+)(D)$');
+                                    Match? match =
+                                        regex.firstMatch(_expression);
+                                    if (match != null) {
+                                      int maxNumber =
+                                          int.parse(match.group(1)!);
+                                      if (maxNumber > 0) {
+                                        int randomNumber =
+                                            math.Random().nextInt(maxNumber) +
+                                                1;
+                                        _expression = _expression.replaceFirst(
+                                            regex, randomNumber.toString());
+                                        _result =
+                                            _evaluateExpression(_expression);
+                                        showSnackbar(
+                                            context, "Random number picked!");
+                                      }
+                                    }
+                                  } else {
+                                    _expression += button;
                                   }
-                                } else {
-                                  _expression += button;
-                                }
-                                _result = _evaluateExpression(_expression);
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _getButtonColor(button),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                                  _result = _evaluateExpression(_expression);
+                                });
+                              },
+                              startColor: _getButtonColor(button),
+                              borderColor:
+                                  _getButtonColor(button).withOpacity(0.5),
+                              endColor:
+                                  _getButtonColor(button).withOpacity(0.8),
+                              borderRadius: 30,
+                              child: Text(
+                                button,
+                                style: GoogleFonts.onest(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: button != "<<" && button != ">>"
+                                      ? 32
+                                      : 16,
+                                  color: _isSpecialButton(button)
+                                      ? Colors.white
+                                      : Colors.black87,
+                                ),
                               ),
-                              elevation: 5,
-                            ),
-                            child: Text(
-                              button,
-                              style: GoogleFonts.roboto(
-                                fontSize:
-                                    button != "<<" && button != ">>" ? 32 : 18,
-                                color: _isSpecialButton(button)
-                                    ? Colors.white
-                                    : Colors.black87,
-                              ),
-                            ),
-                          );
-                  },
-                ),
+                            );
+                    }),
               ),
             ),
           ],
