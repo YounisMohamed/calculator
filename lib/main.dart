@@ -1,7 +1,11 @@
 import 'package:calculator/calcHome.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+SharedPreferences? sp;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  sp = await SharedPreferences.getInstance();
   runApp(const MyApp());
 }
 
@@ -14,11 +18,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:  CalculatorPage(),
+      home: CalculatorPage(),
     );
   }
 }

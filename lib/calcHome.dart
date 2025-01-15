@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'main.dart';
 
 class CalculatorPage extends StatefulWidget {
   @override
@@ -228,11 +231,29 @@ class _CalculatorPageState extends State<CalculatorPage> {
     return expression;
   }
 
-  void setTheme(int themeInt) {
-    theme = themeInt;
+  late SharedPreferences _prefs;
+  int theme = 0;
+
+  @override
+  void initState() {
+    _initialize();
+    super.initState();
   }
 
-  static String name = "YONES";
+  void _initialize() {
+    setState(() {
+      theme = sp?.getInt("theme") ?? 0;
+    });
+  }
+
+  void _toggleTheme() {
+    setState(() {
+      theme = (theme + 1) % themes.length;
+      sp?.setInt("theme", theme);
+    });
+  }
+
+  static String name = "REMAN";
   List<String> functionalButtons = name.split("");
   void PRINT() {
     print(functionalButtons);
@@ -240,7 +261,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
   String _expression = "";
   // ${name.substring(0, 1)}${name.substring(1).toLowerCase()}
-  String _result = "Hello Younis";
+  String _result = "Hello Reman";
   String _savedResult = "";
 
   final Color backgroundColor = const Color(0xFF1A1A2E);
@@ -249,26 +270,129 @@ class _CalculatorPageState extends State<CalculatorPage> {
   final Color deleteColor = Colors.pink;
   final Color functionColor = Colors.deepPurple;
   final Color numberColor = Colors.white;
-  int theme = 0;
-  final List<Map<String, Color>> themes = [
+  final List<Map<String, dynamic>> themes = [
     {
+      // DARK THEME
+      "backGroundColorGradientBottom": Colors.indigo,
+      "backGroundColorGradientTop": Colors.black87,
       "displayBackground": const Color(0xFF16213E),
       "divider": Colors.white70,
       "expressionText": Colors.white,
       "resultText": Colors.lightBlueAccent,
+      "numberColors": Colors.white,
+      "numberTextColors": Colors.black87,
     },
     {
-      "displayBackground": Colors.greenAccent,
-      "divider": Colors.black87,
-      "expressionText": Colors.black,
-      "resultText": Colors.deepPurple,
+      // NEON CYBERPUNK THEME
+      "backGroundColorGradientBottom": Colors.black87,
+      "backGroundColorGradientTop": Colors.purple.shade900,
+      "displayBackground": Colors.black,
+      "divider": Colors.cyanAccent,
+      "expressionText": Colors.pinkAccent,
+      "resultText": Colors.greenAccent,
+      "numberColors": Colors.cyanAccent,
+      "numberTextColors": Colors.black87,
     },
+    {
+      // BLUE-TURQUOISE THEME
+      "backGroundColorGradientBottom": Colors.cyan.shade800,
+      "backGroundColorGradientTop": Colors.teal.shade600,
+      "displayBackground": Colors.teal,
+      "divider": Colors.white,
+      "expressionText": Colors.white,
+      "resultText": Colors.cyanAccent,
+      "numberColors": Colors.cyan,
+      "numberTextColors": Colors.white,
+    },
+    {
+      // WHITE THEME
+      "backGroundColorGradientBottom": Colors.white24,
+      "backGroundColorGradientTop": Colors.orangeAccent.shade200,
+      "displayBackground": Colors.orange,
+      "divider": Colors.black87,
+      "expressionText": Colors.white,
+      "resultText": Colors.black87,
+      "numberColors": Colors.black87,
+      "numberTextColors": Colors.white,
+    },
+    {
+      // PURPLE-ORANGE THEME
+      "backGroundColorGradientBottom": Colors.deepPurple,
+      "backGroundColorGradientTop": Colors.orangeAccent,
+      "displayBackground": Colors.deepPurple.shade400,
+      "divider": Colors.orange,
+      "expressionText": Colors.black54,
+      "resultText": Colors.deepPurple.shade50,
+      "numberColors": Colors.deepPurple.shade100,
+      "numberTextColors": Colors.black87,
+    },
+    {
+      // GREEN-LIME THEME
+      "backGroundColorGradientBottom": Colors.green.shade900,
+      "backGroundColorGradientTop": Colors.limeAccent.shade200,
+      "displayBackground": Colors.green.shade600,
+      "divider": Colors.lime,
+      "expressionText": Colors.lime.shade50,
+      "resultText": Colors.greenAccent,
+      "numberColors": Colors.limeAccent,
+      "numberTextColors": Colors.black87,
+    },
+    {
+      // SUNSET THEME
+      "backGroundColorGradientBottom": Colors.red.shade700,
+      "backGroundColorGradientTop": Colors.pink.shade300,
+      "displayBackground": Colors.pink.shade900,
+      "divider": Colors.black87,
+      "expressionText": Colors.black87,
+      "resultText": Colors.indigo,
+      "numberColors": Colors.red.shade300,
+      "numberTextColors": Colors.black87,
+    },
+    {
+      // OCEAN DEPTHS THEME
+      "backGroundColorGradientBottom": Colors.blue.shade900,
+      "backGroundColorGradientTop": Colors.lightBlue.shade200,
+      "displayBackground": Colors.blueGrey.shade800,
+      "divider": Colors.lightBlue.shade100,
+      "expressionText": Colors.white,
+      "resultText": Colors.lightBlue.shade200,
+      "numberColors": Colors.blue.shade200,
+      "numberTextColors": Colors.blueGrey.shade900,
+    },
+    {
+      // MIDNIGHT GALAXY THEME
+      "backGroundColorGradientBottom": Colors.purple.shade900,
+      "backGroundColorGradientTop": Colors.indigo.shade200,
+      "displayBackground": const Color(0xFF1A237E),
+      "divider": Colors.purple.shade100,
+      "expressionText": Colors.white,
+      "resultText": Colors.purpleAccent.shade100,
+      "numberColors": Colors.deepPurple.shade200,
+      "numberTextColors": Colors.indigo.shade900,
+    },
+    {
+      // DESERT SAND THEME
+      "backGroundColorGradientBottom": Colors.brown.shade700,
+      "backGroundColorGradientTop": Colors.orange.shade200,
+      "displayBackground": Colors.brown.shade800,
+      "divider": Colors.orange.shade300,
+      "expressionText": Colors.orange.shade50,
+      "resultText": Colors.deepOrange.shade200,
+      "numberColors": Colors.brown.shade200,
+      "numberTextColors": Colors.brown.shade900,
+    },
+    {
+      // AUTUMN THEME
+      "backGroundColorGradientBottom": Colors.deepOrange.shade800,
+      "backGroundColorGradientTop": Colors.amber.shade300,
+      "displayBackground": Colors.brown.shade700,
+      "divider": Colors.amber.shade200,
+      "expressionText": Colors.orange.shade50,
+      "resultText": Colors.deepOrange.shade200,
+      "numberColors": Colors.amber.shade200,
+      "numberTextColors": Colors.black87,
+    }
   ];
-  void _toggleTheme() {
-    setState(() {
-      theme = (theme + 1) % themes.length;
-    });
-  }
 
   List<String> buttons = [
     "7",
@@ -313,7 +437,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
     } else if (functionalButtons.contains(button)) {
       return functionColor;
     }
-    return numberColor;
+    return currentTheme["numberColors"];
   }
 
   bool _isSpecialButton(String button) {
@@ -371,159 +495,169 @@ class _CalculatorPageState extends State<CalculatorPage> {
       ...functionalButtons
     ];
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Display for Expression and Result
-            Container(
-              decoration: BoxDecoration(
-                color: currentTheme["displayBackground"],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: const EdgeInsets.all(20),
-              margin: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    height: 60,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      reverse: true,
-                      child: Text(
-                        _expression,
-                        style: GoogleFonts.roboto(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: currentTheme["expressionText"],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Divider(thickness: 1, color: currentTheme["divider"]),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    height: 80,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      reverse: true,
-                      child: Text(
-                        _result,
-                        style: GoogleFonts.roboto(
-                          fontSize: (48 - (_result.length))
-                              .clamp(24.0, 48.0)
-                              .toDouble(),
-                          fontWeight: FontWeight.bold,
-                          color: currentTheme["resultText"],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                color: Colors.black87,
-                child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
-                      crossAxisSpacing: 7,
-                      mainAxisSpacing: 7,
-                    ),
-                    itemCount: buttons.length,
-                    itemBuilder: (context, index) {
-                      String button = buttons[index];
-                      return button.isEmpty
-                          ? const SizedBox.shrink()
-                          : NiceButtons(
-                              onTap: (finish) {
-                                setState(() {
-                                  if (button == "C") {
-                                    _expression = "";
-                                    _result = "0";
-                                  } else if (button == "<") {
-                                    if (_expression.isNotEmpty) {
-                                      _expression = _expression.substring(
-                                          0, _expression.length - 1);
-                                    }
-                                  } else if (button == functionalButtons[0]) {
-                                    _toggleTheme();
-                                    showSnackbar(context, "Theme Changed!");
-                                  } else if (button == functionalButtons[1]) {
-                                    if (RegExp(r'^[0-9.]+$')
-                                        .hasMatch(_result)) {
-                                      _savedResult = _result;
-                                      showSnackbar(context, "Result Saved!");
-                                    }
-                                  } else if (button == functionalButtons[2]) {
-                                    _expression += _savedResult;
-                                  } else if (button == functionalButtons[3]) {
-                                    if (RegExp(r'^[0-9.]+$')
-                                        .hasMatch(_result)) {
-                                      double number = double.parse(_result);
-                                      int flooredNumber = number.round();
-                                      _result = flooredNumber.toString();
-                                      if (_expression != _result) {
-                                        showSnackbar(
-                                            context, "Number Rounded!");
-                                        _expression = _result;
-                                      }
-                                    }
-                                  } else if (button == functionalButtons[4]) {
-                                    _expression += button;
-                                    RegExp regex = RegExp(r'(\d+)(D)$');
-                                    Match? match =
-                                        regex.firstMatch(_expression);
-                                    if (match != null) {
-                                      int maxNumber =
-                                          int.parse(match.group(1)!);
-                                      if (maxNumber > 0) {
-                                        int randomNumber =
-                                            math.Random().nextInt(maxNumber) +
-                                                1;
-                                        _expression = _expression.replaceFirst(
-                                            regex, randomNumber.toString());
-                                        _result =
-                                            _evaluateExpression(_expression);
-                                        showSnackbar(
-                                            context, "Random number picked!");
-                                      }
-                                    }
-                                  } else {
-                                    _expression += button;
-                                  }
-                                  _result = _evaluateExpression(_expression);
-                                });
-                              },
-                              startColor: _getButtonColor(button),
-                              borderColor:
-                                  _getButtonColor(button).withOpacity(0.5),
-                              endColor:
-                                  _getButtonColor(button).withOpacity(0.8),
-                              borderRadius: 30,
-                              child: Text(
-                                button,
-                                style: GoogleFonts.onest(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: button != "<<" && button != ">>"
-                                      ? 32
-                                      : 16,
-                                  color: _isSpecialButton(button)
-                                      ? Colors.white
-                                      : Colors.black87,
-                                ),
-                              ),
-                            );
-                    }),
-              ),
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+          colors: [
+            currentTheme["backGroundColorGradientTop"],
+            currentTheme["backGroundColorGradientBottom"]
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        )),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Display for Expression and Result
+              Container(
+                decoration: BoxDecoration(
+                  color: currentTheme["displayBackground"],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      height: 60,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        reverse: true,
+                        child: Text(
+                          _expression,
+                          style: GoogleFonts.onest(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: currentTheme["expressionText"],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Divider(thickness: 1, color: currentTheme["divider"]),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      height: 80,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        reverse: true,
+                        child: Text(
+                          _result,
+                          style: GoogleFonts.onest(
+                            fontSize: (48 - (_result.length))
+                                .clamp(24.0, 48.0)
+                                .toDouble(),
+                            fontWeight: FontWeight.bold,
+                            color: currentTheme["resultText"],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 5,
+                        crossAxisSpacing: 7,
+                        mainAxisSpacing: 7,
+                      ),
+                      itemCount: buttons.length,
+                      itemBuilder: (context, index) {
+                        String button = buttons[index];
+                        return button.isEmpty
+                            ? const SizedBox.shrink()
+                            : NiceButtons(
+                                onTap: (finish) {
+                                  setState(() {
+                                    if (button == "C") {
+                                      _expression = "";
+                                      _result = "0";
+                                    } else if (button == "<") {
+                                      if (_expression.isNotEmpty) {
+                                        _expression = _expression.substring(
+                                            0, _expression.length - 1);
+                                      }
+                                    } else if (button == functionalButtons[0]) {
+                                      _toggleTheme();
+                                      showSnackbar(context, "Theme Changed!");
+                                    } else if (button == functionalButtons[1]) {
+                                      if (RegExp(r'^[0-9.]+$')
+                                          .hasMatch(_result)) {
+                                        _savedResult = _result;
+                                        showSnackbar(context, "Result Saved!");
+                                      }
+                                    } else if (button == functionalButtons[2]) {
+                                      _expression += _savedResult;
+                                    } else if (button == functionalButtons[3]) {
+                                      if (RegExp(r'^[0-9.]+$')
+                                          .hasMatch(_result)) {
+                                        double number = double.parse(_result);
+                                        int flooredNumber = number.round();
+                                        _result = flooredNumber.toString();
+                                        if (_expression != _result) {
+                                          showSnackbar(
+                                              context, "Number Rounded!");
+                                          _expression = _result;
+                                        }
+                                      }
+                                    } else if (button == functionalButtons[4]) {
+                                      _expression += button;
+                                      RegExp regex = RegExp(r'(\d+)(D)$');
+                                      Match? match =
+                                          regex.firstMatch(_expression);
+                                      if (match != null) {
+                                        int maxNumber =
+                                            int.parse(match.group(1)!);
+                                        if (maxNumber > 0) {
+                                          int randomNumber =
+                                              math.Random().nextInt(maxNumber) +
+                                                  1;
+                                          _expression =
+                                              _expression.replaceFirst(regex,
+                                                  randomNumber.toString());
+                                          _result =
+                                              _evaluateExpression(_expression);
+                                          showSnackbar(
+                                              context, "Random number picked!");
+                                        }
+                                      }
+                                    } else {
+                                      _expression += button;
+                                    }
+                                    _result = _evaluateExpression(_expression);
+                                  });
+                                },
+                                startColor: _getButtonColor(button),
+                                borderColor:
+                                    _getButtonColor(button).withOpacity(0.7),
+                                endColor:
+                                    _getButtonColor(button).withOpacity(0.9),
+                                borderRadius: 30,
+                                stretch: true,
+                                borderThickness: 2,
+                                child: Text(
+                                  button,
+                                  style: GoogleFonts.onest(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: button != "<<" && button != ">>"
+                                          ? 32
+                                          : 16,
+                                      color: currentTheme["numberTextColors"]),
+                                ),
+                              );
+                      }),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
